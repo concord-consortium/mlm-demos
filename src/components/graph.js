@@ -9,14 +9,21 @@ export default class Graph extends Component {
     }
   }
 
+  handleEdgeClick(edge) {
+    return () => {
+      this.props.onEdgeClick(edge);
+    }
+  }
+
   render() {
     const {graph} = this.props;
     const edgeViews = graph.edges.map((e) => {
+      const handleEdgeClick = this.handleEdgeClick(e);
       const o = findNode(graph, e.origin);
       const d = findNode(graph, e.destination);
       const path = `M${o.x} ${o.y} L${d.x} ${d.y}`;
       return (
-        <g>
+        <g key={`${o.id}-${d.id}`} onClick={handleEdgeClick}>
           <path d={path} stroke="black" strokeWidth="12" fill="transparent" />
           <path d={path} stroke="#61DAFB" strokeWidth="8" fill="transparent" />
         </g>
@@ -24,22 +31,25 @@ export default class Graph extends Component {
     });
 
     const nodeViews = graph.nodes.map((n) => {
-      const handleClick = this.handleNodeClick(n);
+      const handleNodeClick = this.handleNodeClick(n);
+      const r = n.r || 60;
+      const strokeWidth = n.selected ? r/7 : r/15;
+      const fill = n.selected ?  "#47aac6" : "#61DAFB";
       return (
-        <g onClick={handleClick}>
-          <circle cx={n.x} cy={n.y} r="60" strokeWidth={n.selected ? 8 : 4} />
-          <text fill="black" textAnchor="middle" alignmentBaseline="central" font-size="30px"
-            x={n.x} y={n.y}>{n.id}</text>
+        <g key={n.id} onClick={handleNodeClick}>
+          <circle cx={n.x} cy={n.y} r={r} strokeWidth={strokeWidth} fill={fill} />
+          <text fill="black" textAnchor="middle" alignmentBaseline="central" fontSize="30px"
+            x={n.x} y={n.y}>{n.label !== undefined ? n.label : n.id}</text>
         </g>
       );
     });
 
     return (
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 841.9 595.3">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="500px">
         <g>
           {edgeViews}
         </g>
-        <g fill="#61DAFB" stroke="black">
+        <g stroke="black">
           {nodeViews}
         </g>
       </svg>
