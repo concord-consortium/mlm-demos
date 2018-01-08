@@ -8,6 +8,7 @@ spawn:
     which: random
   every: 390
   # never: true
+dieWhenExitingWorld: false
 properties:
   speed: 1.2
   size: 1

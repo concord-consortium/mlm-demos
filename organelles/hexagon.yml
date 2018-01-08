@@ -8,6 +8,7 @@ spawn:
     which: random
   every: 300
   # never: true
+dieWhenExitingWorld: false
 properties:
   size: 1
 initialState: flowing
