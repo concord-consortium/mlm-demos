@@ -117,10 +117,16 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showBinding: false
+      showBinding: false,
+      box1: "organism",
+      box2: "none",
+      box3: "organism",
+      box4: "none"
     };
     this.onEdgeClick = this.onEdgeClick.bind(this);
     this.onSetGraphState = this.onSetGraphState.bind(this);
+    this.handleViewChange = this.handleViewChange.bind(this);
+    this.getBoxView = this.getBoxView.bind(this);
   }
 
   onNodeClick = (node) => {
@@ -193,21 +199,105 @@ class App extends Component {
     this.forceUpdate();
   }
 
+  handleViewChange(event) {
+    this.setState({ [event.target.id]: event.target.value });
+  }
+
+  getBoxView(boxId) {
+    const opt = this.state[boxId];
+    const viewBoxes = {
+      cell: "0 0 1280 800",
+      membrane: "500 100 320 200",
+      golgi: "400 400 320 200"
+    };
+
+    if (opt === "none") {
+      return null;
+    } else if (opt === "organism") {
+      return <img src="assets/sandrat-dark.png" width="500px" />
+    } else {
+      return (
+        <OrganelleWrapper 
+          name={boxId + "-model"}
+          viewBox={viewBoxes[opt]}
+          modelProperties={currentGraphState.modelProperties} 
+          showBinding={this.state.showBinding}
+          setGraphState={this.onSetGraphState}
+        />
+      );
+    }
+  }
+
   render() {
     return (
       <div className="App">
         <header className="App-header">
-          <h1 className="App-title">State-Graph Demo</h1>
+          <h1 className="App-title">Multi-level Model Demos &mdash; 4-up</h1>
         </header>
         <Graph graph={currentGraph} onNodeClick={this.onNodeClick} onEdgeClick={this.onEdgeClick}/>
         <button onClick={this.onButtonClick}>Add Tyr_1</button>
         <div className="state"><b>State:</b> {currentGraphState.name}</div>
-        <div>
-          <OrganelleWrapper 
-            modelProperties={currentGraphState.modelProperties} 
-            showBinding={this.state.showBinding}
-            setGraphState={this.onSetGraphState}
-          />
+        <div className="four-up">
+          <div>
+            <div>
+              <div>
+                <select id="box1" value={this.state.box1} onChange={this.handleViewChange}>
+                  <option value="none">None</option>
+                  <option value="organism">Organism</option>
+                  <option value="cell">Cell</option>
+                  <option value="membrane">Membrane</option>
+                  <option value="golgi">Golgi</option>
+                </select>
+              </div>
+              <div className="box">
+                { this.getBoxView("box1") }
+              </div>
+            </div>
+            <div>
+              <div>
+                <select id="box2" value={this.state.box2} onChange={this.handleViewChange}>
+                  <option value="none">None</option>
+                  <option value="organism">Organism</option>
+                  <option value="cell">Cell</option>
+                  <option value="membrane">Membrane</option>
+                  <option value="golgi">Golgi</option>
+                </select>
+              </div>
+              <div className="box">
+                { this.getBoxView("box2") }
+              </div>
+            </div>
+          </div>
+          <div>
+            <div>
+              <div>
+                <select id="box3" value={this.state.box3} onChange={this.handleViewChange}>
+                  <option value="none">None</option>
+                  <option value="organism">Organism</option>
+                  <option value="cell">Cell</option>
+                  <option value="membrane">Membrane</option>
+                  <option value="golgi">Golgi</option>
+                </select>
+              </div>
+              <div className="box">
+                { this.getBoxView("box3") }
+              </div>
+            </div>
+            <div>
+              <div>
+                <select id="box4" value={this.state.box4} onChange={this.handleViewChange}>
+                  <option value="none">None</option>
+                  <option value="organism">Organism</option>
+                  <option value="cell">Cell</option>
+                  <option value="membrane">Membrane</option>
+                  <option value="golgi">Golgi</option>
+                </select>
+              </div>
+              <div className="box">
+                { this.getBoxView("box4") }
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );

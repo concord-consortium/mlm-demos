@@ -1,15 +1,15 @@
 /*globals Organelle Snap */
 import React, { Component } from 'react';
 
-let model;
-
 export default class OrganelleWrapper extends Component {
   constructor(props) {
     super(props);
+    this.model = null;
     this.showHexBinding = this.showHexBinding.bind(this)
   }
 
   componentDidMount() {
+    const _this = this;
     const {modelProperties} = this.props;
     modelProperties["receptor_is_bound"] = false;
 
@@ -24,7 +24,7 @@ export default class OrganelleWrapper extends Component {
     //     parentPhone
 
     Organelle.createModel({
-      element: "model",
+      element: this.props.name,
       background: {
         file: "assets/melanocyte.svg",
         selector: "#cell"
@@ -94,67 +94,67 @@ export default class OrganelleWrapper extends Component {
         "organelles/g-protein-part.yml"
       ]
     }).then((m) => {
-      model = m;
+      _this.model = m;
     });
   }
 
   showHexBinding() {
-    var hex = model.world.createAgent(model.world.species[0]);
+    var _this = this;
+    var hex = _this.model.world.createAgent(_this.model.world.species[0]);
     hex.state = "heading_to_receptor";
 
     var transformReceptor = function() {
       // var protein = Snap.select("#receptor_x5F_protein");
 
-      document.getElementById("sensor_0_Layer0_0_FILL").style["fill"] = "rgb(239,1,82)";
-      document.getElementById("piece1_0_Layer0_0_FILL").style["fill"] = "rgb(239,1,82)";
+      document.querySelector(`#${_this.props.name} #sensor_0_Layer0_0_FILL`).style["fill"] = "rgb(239,1,82)";
+      document.querySelector(`#${_this.props.name} #piece1_0_Layer0_0_FILL`).style["fill"] = "rgb(239,1,82)";
     }
-
-    var _this = this;
     var gProteinPart;
 
     var waitingForGProteinPart = function() {
       if (gProteinPart.dead) {
         hex.task_die(true);
 
-        document.getElementById("sensor_0_Layer0_0_FILL").style["fill"] = "rgb(201, 56, 104)";
-        document.getElementById("piece1_0_Layer0_0_FILL").style["fill"] = 'url("#_Radial5")';
-        model.world.setProperty("receptor_is_bound", false);
-        model.world.agents[0].state = "away_from_receptor";
+        document.querySelector(`#${_this.props.name} #sensor_0_Layer0_0_FILL`).style["fill"] = "rgb(201, 56, 104)";
+        document.querySelector(`#${_this.props.name} #piece1_0_Layer0_0_FILL`).style["fill"] = 'url("#_Radial5")';
+        _this.model.world.setProperty("receptor_is_bound", false);
+        _this.model.world.agents[0].state = "away_from_receptor";
         _this.props.setGraphState("B");
       } else {
-        model.setTimeout(waitingForGProteinPart, 500)
+        _this.model.setTimeout(waitingForGProteinPart, 500)
       }
     }
 
     var waitingForGProtein = function() {
-      if (model.world.agents[0].state === "stick_to_receptor") {
+      if (_this.model.world.agents[0].state === "stick_to_receptor") {
         _this.props.setGraphState("AB3");
-        gProteinPart = model.world.createAgent(model.world.species[3]);
-        model.setTimeout(waitingForGProteinPart, 500)
+        gProteinPart = _this.model.world.createAgent(_this.model.world.species[3]);
+        _this.model.setTimeout(waitingForGProteinPart, 500)
       } else {
-        model.setTimeout(waitingForGProtein, 500)
+        _this.model.setTimeout(waitingForGProtein, 500)
       }
     }
 
     var waitingForBinding = function() {
       if (hex.state === "waiting_on_receptor") {
         transformReceptor();
-        model.world.setProperty("receptor_is_bound", true);
+        _this.model.world.setProperty("receptor_is_bound", true);
         _this.props.setGraphState("AB2");
         waitingForGProtein();
       } else {
-        model.setTimeout(waitingForBinding, 500)
+        console.log(_this.props.name, _this.model.world.agents.length);
+        _this.model.setTimeout(waitingForBinding, 100)
       }
     }
     
-    model.setTimeout(waitingForBinding, 500)
+    _this.model.setTimeout(waitingForBinding, 500)
   }
 
   componentWillReceiveProps(nextProps) {
     console.log(nextProps);
     if (nextProps.modelProperties) {
-      Object.keys(nextProps.modelProperties).forEach(function (key) {
-        model.world.setProperty(key, nextProps.modelProperties[key]);
+      Object.keys(nextProps.modelProperties).forEach((key) => {
+        this.model.world.setProperty(key, nextProps.modelProperties[key]);
       });
     }
 
@@ -164,6 +164,6 @@ export default class OrganelleWrapper extends Component {
   }
 
   render() {
-    return <svg id="model" width="1200px" viewBox="0 0 1280 800" className="model" />;
+    return <svg id={this.props.name} width="500px" viewBox={this.props.viewBox} className="model" />;
   }
 }

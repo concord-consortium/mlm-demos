@@ -22,3 +22,22 @@ button {
   margin-top: -10px;
   margin-bottom: 10px;
 }
+
+.four-up {
+  display: flex;
+}
+
+.four-up>div {
+  padding: 20px;
+}
+
+.four-up>div>div {
+  padding-bottom: 6px;
+}
+ 
+.box {
+  width: 500px;
+  height: 312px;
+  border: 1px solid;
+  overflow: hidden;
+}
