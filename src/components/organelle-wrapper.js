@@ -5,23 +5,29 @@ export default class OrganelleWrapper extends Component {
   constructor(props) {
     super(props);
     this.model = null;
-    this.showHexBinding = this.showHexBinding.bind(this)
+    this.showHexBinding = this.showHexBinding.bind(this);
+    this.addHormone = this.addHormone.bind(this);
   }
 
   componentDidMount() {
     const _this = this;
-    const {modelProperties} = this.props;
+    const {modelProperties, currentView} = this.props;
     modelProperties["receptor_is_bound"] = false;
 
-    // var initialDrakeColor = "lava",
-    //     finalDrakeColor = "charcoal",
-    //     alleles,
-    //     numStars,
-    //     gameType = "size", // "gate", "nucleus"
-    //     isNucleusGame = false,
-    //     nucleusGenes,
-    //     gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand=10111111&initial-state=size&target-color=lava",
-    //     parentPhone
+    let speciesList;
+    console.log("currentView",currentView)
+    if (currentView === "golgi") {
+      speciesList = [
+        "organelles/melanosome.yml"
+      ]
+    } else {
+      speciesList = [
+        "organelles/hexagon.yml",
+        "organelles/triangle.yml",
+        "organelles/g-protein.yml",
+        "organelles/g-protein-part.yml"
+      ]
+    }
 
     Organelle.createModel({
       element: this.props.name,
@@ -85,17 +91,24 @@ export default class OrganelleWrapper extends Component {
         }
       },
       clickHandlers: [],
-      species: [
-        // "organelles/melanosome.yml",
-        // "organelles/zoomed-melanosome.yml",
-        "organelles/hexagon.yml",
-        "organelles/triangle.yml",
-        "organelles/g-protein.yml",
-        "organelles/g-protein-part.yml"
-      ]
+      species: speciesList,
     }).then((m) => {
       _this.model = m;
+
+      _this.model.setTimeout(() => {
+        document.getElementById("cellshape_0_Layer0_0_FILL").style["fill-opacity"] = 0.5;
+        document.querySelector(`#${_this.props.name} #cellshape_0_Layer0_0_FILL`).style["fill"] = "rgb(241,212,151)";
+      }, 1);
     });
+  }
+
+  addHormone() {
+    var _this = this;
+    for (let i = 0; i < 30; i++) {
+      this.model.setTimeout(() => {
+        _this.model.world.createAgent(_this.model.world.species[0]);
+      }, 50 * i);
+    }
   }
 
   showHexBinding() {
@@ -160,6 +173,16 @@ export default class OrganelleWrapper extends Component {
 
     if (!this.props.showBinding && nextProps.showBinding) {
       this.showHexBinding();
+    }
+
+    if (!this.props.addHormone && nextProps.addHormone) {
+      this.addHormone();
+    }
+
+    if (nextProps.addEnzyme) {
+      document.querySelector(`#${this.props.name} #cellshape_0_Layer0_0_FILL`).style["fill"] = "rgb(177,122,50)";
+    } else {
+      document.querySelector(`#${this.props.name} #cellshape_0_Layer0_0_FILL`).style["fill"] = "rgb(241,212,151)";
     }
   }
 

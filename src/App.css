@@ -41,3 +41,12 @@ button {
   border: 1px solid;
   overflow: hidden;
 }
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  margin: 5px;
+}
